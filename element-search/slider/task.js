@@ -2,36 +2,23 @@
 const sliderItems = document.querySelectorAll(".slider__item");
 const arrows = document.querySelectorAll(".slider__arrow");
 const dots = document.querySelectorAll(".slider__dot");
-
-// Устанавливаем начальный индекс слайда
-let currentIndex = 0;
+sliderItems[0].classList.add("slider__item_active");
+dots[0].classList.add("slider__dot_active");
+sliderItems.currentIndex = 0;
 
 // Функция для переключения на следующий слайд
 function nextSlide() {
-  // Скрываем текущий слайд
-  sliderItems[currentIndex].classList.remove("slider__item_active");
-  // Увеличиваем индекс слайда
-  currentIndex++;
-  // Если достигли конца, переходим на первый слайд
-  if (currentIndex >= sliderItems.length) {
-    currentIndex = 0;
-  }
-  // Показываем следующий слайд
-  sliderItems[currentIndex].classList.add("slider__item_active");
+  let newIndex=controlIndex(sliderItems.currentIndex+1);
+  changeSlider(sliderItems.currentIndex,newIndex);
+  sliderItems.currentIndex = newIndex;
 }
 
 // Функция для переключения на предыдущий слайд
 function prevSlide() {
-  // Скрываем текущий слайд
-  sliderItems[currentIndex].classList.remove("slider__item_active");
   // Уменьшаем индекс слайда
-  currentIndex--;
-  // Если достигли начала, переходим на последний слайд
-  if (currentIndex < 0) {
-    currentIndex = sliderItems.length - 1;
-  }
-  // Показываем предыдущий слайд
-  sliderItems[currentIndex].classList.add("slider__item_active");
+  let newIndex=controlIndex(sliderItems.currentIndex-1);
+  changeSlider(sliderItems.currentIndex,newIndex);
+  sliderItems.currentIndex = newIndex;
 }
 
 // Устанавливаем обработчики события click на кнопки «Влево» и «Вправо»
@@ -48,11 +35,22 @@ arrows.forEach((arrow) => {
 // Устанавливаем обработчики события click на точки
 dots.forEach((dot, index) => {
   dot.onclick = function () {
-    // Скрываем текущий слайд
-    sliderItems[currentIndex].classList.remove("slider__item_active");
-    // Устанавливаем новый индекс слайда
-    currentIndex = index;
-    // Показываем выбранный слайд
-    sliderItems[currentIndex].classList.add("slider__item_active");
+    let oldIndex=sliderItems.currentIndex;
+    changeSlider(oldIndex,index);
+    sliderItems.currentIndex = index;
   };
 });
+
+function controlIndex( index){
+  if (index >= sliderItems.length)     index = 0;
+  if (index < 0)     index = sliderItems.length-1;
+  return index;
+}
+function changeSlider(oldIndex,newIndex ){
+   // Скрываем текущий слайд
+  sliderItems[oldIndex].classList.remove("slider__item_active");
+  dots[oldIndex].classList.remove("slider__dot_active");
+  // Показываем выбранный слайд
+   sliderItems[newIndex].classList.add("slider__item_active");
+   dots[newIndex].classList.add("slider__dot_active");
+}
