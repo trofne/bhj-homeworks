@@ -1,39 +1,33 @@
-// функция для отправки формы и отслеживания прогресса загрузки
-function uploadFile() {
-  var form = $("#form")[0]; // получаем элемент формы
-  var formData = new FormData(form); // создаем объект FormData для отправки формы
+const form = document.getElementById("signin__form");
+const loginInput = form.querySelector('[name="login"]');
+const passwordInput = form.querySelector('[name="password"]');
+const signInBtn = document.getElementById("signin__btn");
+const welcomeBlock = document.getElementById("welcome");
+const welcomeUserId = document.getElementById("user_id");
 
-  $.ajax({
-    url: "https://students.netoservices.ru/nestjs-backend/upload", // адрес для отправки формы
-    type: "POST",
-    data: formData, // данные для отправки формы
-    processData: false, // отключаем обработку данных перед отправкой
-    contentType: false, // отключаем установку заголовка Content-Type
-    xhr: function () {
-      var xhr = $.ajaxSettings.xhr(); // создаем объект XMLHttpRequest
+signInBtn.addEventListener("click", (event) => {
+  event.preventDefault();
 
-      // добавляем обработчик изменения состояния загрузки
-      xhr.upload.onprogress = function (event) {
-        if (event.lengthComputable) {
-          // проверяем, что длина загруженного файла известна
-          var percentComplete = (event.loaded / event.total) * 100; // вычисляем процент загрузки
-          $("#progress").val(percentComplete); // устанавливаем значение прогресс-бара
-        }
-      };
+  const formData = new FormData(form);
 
-      return xhr; // возвращаем объект XMLHttpRequest
-    },
-    success: function (data) {
-      alert("Файл успешно загружен!"); // выводим диалоговое окно с сообщением об успешной загрузке файла
-    },
-    error: function (xhr, status, error) {
-      alert("Произошла ошибка при загрузке файла: " + error); // выводим диалоговое окно с сообщением об ошибке загрузки файла
-    },
-  });
-}
-
-// добавляем обработчик клика на кнопку отправки формы
-$("#send").click(function (event) {
-  event.preventDefault(); // отменяем стандартное поведение кнопки
-  uploadFile(); // вызываем функцию для отправки формы и отслеживания прогресса загрузки
+  fetch("https://students.netoservices.ru/nestjs-backend/auth", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        localStorage.setItem("userId", data.user_id);
+        welcomeUserId.textContent = data.user_id;
+        welcomeBlock.classList.add("welcome_active");
+      } else {
+        alert("Неверный логин/пароль");
+      }
+    })
+    .catch((error) => console.error(error));
 });
+
+if (localStorage.getItem("userId")) {
+  welcomeUserId.textContent = localStorage.getItem("userId");
+  welcomeBlock.classList.add("welcome_active");
+}
