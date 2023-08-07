@@ -1,33 +1,23 @@
-const form = document.getElementById("signin__form");
-const loginInput = form.querySelector('[name="login"]');
-const passwordInput = form.querySelector('[name="password"]');
-const signInBtn = document.getElementById("signin__btn");
-const welcomeBlock = document.getElementById("welcome");
-const welcomeUserId = document.getElementById("user_id");
+const form = document.getElementById("form");
+const uploadFileButton = document.getElementById("send");
+const progressBar = document.getElementById("progress");
 
-signInBtn.addEventListener("click", (event) => {
+uploadFileButton.addEventListener("click", (event) => {
   event.preventDefault();
 
   const formData = new FormData(form);
 
-  fetch("https://students.netoservices.ru/nestjs-backend/auth", {
-    method: "POST",
-    body: formData,
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.success) {
-        localStorage.setItem("userId", data.user_id);
-        welcomeUserId.textContent = data.user_id;
-        welcomeBlock.classList.add("welcome_active");
-      } else {
-        alert("Неверный логин/пароль");
-      }
-    })
-    .catch((error) => console.error(error));
+  const request = new XMLHttpRequest();
+  const url = "https://students.netoservices.ru/nestjs-backend/auth";
+  request.open("POST", url);
+  request.setRequestHeader("Content-Type", "multipart/form-data");
+  request.onprogress = (pe) => {
+    if (pe.lengthComputable) {
+      progressBar.value = pe.loaded / pe.total;
+    }
+  };
+  request.onloadend = (pe) => {
+    progressBar.value = 1.0;
+  };
+  request.send(formData);
 });
-
-if (localStorage.getItem("userId")) {
-  welcomeUserId.textContent = localStorage.getItem("userId");
-  welcomeBlock.classList.add("welcome_active");
-}
