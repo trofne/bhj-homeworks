@@ -4,8 +4,10 @@ const signInContainer = document.getElementById("signin");
 const welcomeContainer = document.getElementById("welcome");
 const userIdSpan = document.getElementById("user_id");
 
+if (localStorage.getItem("user_id") != null) welcomeUser();
+
 signInBtn.onclick = () => {
-  signIn();
+  if (localStorage.getItem("user_id") == null) signIn();
 };
 
 function signIn() {
@@ -22,9 +24,8 @@ function signIn() {
     }
     const data = request.response;
     if (data.success) {
-      signInContainer.classList.remove("signin_active");
-      welcomeContainer.classList.add("welcome_active");
-      userIdSpan.textContent = data.user_id;
+      localStorage.setItem("user_id", String(data.user_id));
+      welcomeUser();
     } else {
       alert("Неверные логин/пароль");
     }
@@ -32,4 +33,10 @@ function signIn() {
 
   const formData = new FormData(form);
   request.send(formData);
+}
+
+function welcomeUser() {
+  signInContainer.classList.remove("signin_active");
+  welcomeContainer.classList.add("welcome_active");
+  userIdSpan.textContent = localStorage.getItem("user_id");
 }

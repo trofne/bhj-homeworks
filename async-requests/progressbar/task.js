@@ -11,12 +11,12 @@ uploadFileButton.addEventListener("click", (event) => {
   const url = "https://students.netoservices.ru/nestjs-backend/auth";
   request.open("POST", url);
   request.setRequestHeader("Content-Type", "multipart/form-data");
-  request.onprogress = (pe) => {
+  request.upload.onprogress = (pe) => {
     if (pe.lengthComputable) {
       progressBar.value = pe.loaded / pe.total;
     }
   };
-  request.onloadend = (pe) => {
+  request.upload.onloadend = (pe) => {
     progressBar.value = 1.0;
   };
   request.send(formData);
